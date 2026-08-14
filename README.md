@@ -21,124 +21,73 @@ The project was developed as an end-to-end academic project combining **machine 
 ### 🛡️ Safety Classification
 
 Predictions are categorized into three levels:
+## 🚀 Key Features
 
-```text
-                Predicted HIC
-                     │
-          ┌──────────┼──────────┐
-          ▼          ▼          ▼
-       < 1000     1000–1500    > 1500
-          │          │          │
-        SAFE       WARNING     DANGER
+### 📊 Dataset Management
 
-📊 Dataset Management
-Upload and manage datasets
-View dataset information
-Store datasets through the application
-Manage dataset records through the Django backend
-🧠 Machine Learning Model Management
-Create and manage trained models
-Configure training parameters
-Track model training status
-Store trained model files
-Store feature scaler files
-Maintain training logs
-Activate trained models for prediction
-📈 Model Evaluation
+- Upload and manage datasets
+- View dataset information
+- Store datasets through the application
+- Manage dataset records through the Django backend
+
+### 🧠 Machine Learning Model Management
+
+- Create and manage trained models
+- Configure training parameters
+- Track model training status
+- Store trained model files
+- Store feature scaler files
+- Maintain training logs
+- Activate trained models for prediction
+
+### 📈 Model Evaluation
 
 The system tracks multiple evaluation metrics, including:
 
-Mean Squared Error (MSE)
-Root Mean Squared Error (RMSE)
-Mean Absolute Error (MAE)
-R² Score
-Correlation
-Accuracy
-👤 User Authentication
-User registration
-Login and logout
-Custom user model
-Role-based access
-Protected prediction functionality
-User-specific prediction history
-📜 Prediction History
-Store previous predictions
-View prediction results
-Filter predictions by safety status
-Paginated prediction history
-Admin access to prediction records
-📑 Reports
+- **Mean Squared Error (MSE)**
+- **Root Mean Squared Error (RMSE)**
+- **Mean Absolute Error (MAE)**
+- **R² Score**
+- **Correlation**
+- **Accuracy**
+
+### 👤 User Authentication
+
+- User registration
+- Login and logout
+- Custom user model
+- Role-based access
+- Protected prediction functionality
+- User-specific prediction history
+
+### 📜 Prediction History
+
+- Store previous predictions
+- View prediction results
+- Filter predictions by safety status
+- Paginated prediction history
+- Admin access to prediction records
+
+### 📑 Reports
 
 The project includes dedicated report functionality for:
 
-Dataset reports
-Model reports
-Prediction reports
-Report dashboard
-📊 Dashboard
+- Dataset reports
+- Model reports
+- Prediction reports
+- Report dashboard
 
-A dedicated dashboard provides access to the major parts of the system, including datasets, models, predictions, and reports.
+### 📊 Dashboard
 
-🔬 Prediction Inputs
+A dedicated dashboard provides access to the major parts of the system, including:
 
-The prediction system uses the following parameters:
+- Datasets
+- Machine learning models
+- Predictions
+- Reports
 
-Parameter	Description
-Hood Length	Length of the vehicle hood
-Hood Width	Width of the vehicle hood
-Hood Thickness	Hood thickness
-Material Density	Density of the hood material
-Young's Modulus	Material stiffness property
-Poisson Ratio	Material deformation property
-Yield Strength	Material strength
-Impact Velocity	Impact velocity
-Impact Angle	Impact angle
-Hood Mass	Mass of the hood
-Stiffness	Hood structural stiffness
-Energy Absorption	Energy absorption characteristic
+---
 
-These features are passed through the stored scaler before being provided to the active trained model.
-
-🔄 Complete System Workflow
-                    ┌──────────────────┐
-                    │      User        │
-                    └────────┬─────────┘
-                             │
-                             ▼
-                    ┌──────────────────┐
-                    │ Authentication   │
-                    └────────┬─────────┘
-                             │
-                 ┌───────────┴───────────┐
-                 ▼                       ▼
-        ┌────────────────┐      ┌─────────────────┐
-        │ Dataset Module │      │ Prediction      │
-        │                │      │ Module          │
-        └───────┬────────┘      └────────┬────────┘
-                │                        │
-                ▼                        ▼
-        ┌────────────────┐      ┌─────────────────┐
-        │ Model Training │─────▶│ Active ML Model │
-        └───────┬────────┘      └────────┬────────┘
-                │                        │
-                ▼                        ▼
-        ┌────────────────┐      ┌─────────────────┐
-        │ Model          │      │ HIC Prediction  │
-        │ Evaluation     │      └────────┬────────┘
-        └────────────────┘               │
-                                         ▼
-                              ┌────────────────────┐
-                              │ Safety Assessment  │
-                              │                    │
-                              │ Safe / Warning /   │
-                              │ Danger             │
-                              └─────────┬──────────┘
-                                        │
-                                        ▼
-                              ┌────────────────────┐
-                              │ Prediction History │
-                              │ & Reports          │
-                              └────────────────────┘
 🛠️ Tech Stack
 Backend
 Python
@@ -382,3 +331,8 @@ Full-Stack Developer | Machine Learning Enthusiast
 
 GitHub:
 https://github.com/valabojusumanth10
+
+These features are passed through the stored scaler before being provided to the active trained model.
+
+These features are passed through the stored scaler before being provided to the active trained model.
+```text
