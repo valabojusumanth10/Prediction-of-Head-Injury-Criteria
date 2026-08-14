@@ -1,4 +1,4 @@
-# 🧠 Prediction of Head Injury Criteria (HIC)
+<img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/4fb8423c-371a-4507-8530-54f86e9bc8a9" /># 🧠 Prediction of Head Injury Criteria (HIC)
 
 A full-stack machine learning web application for predicting the **Head Injury Criterion (HIC)** of vehicle hood designs and evaluating their potential pedestrian head-injury risk.
 
@@ -121,64 +121,8 @@ Python-dotenv
 
 The repository's dependency file includes Django, Django REST Framework, MySQL support, NumPy, Pandas, Scikit-learn, TensorFlow/Keras and other supporting packages used by the application.
 
-📂 Project Structure
-Prediction-of-Head-Injury-Criteria/
-│
-├── accounts/
-│   ├── models.py
-│   ├── forms.py
-│   ├── views.py
-│   └── urls.py
-│
-├── dashboard/
-│   ├── views.py
-│   └── urls.py
-│
-├── datasets/
-│   ├── models.py
-│   ├── forms.py
-│   ├── views.py
-│   └── urls.py
-│
-├── models_app/
-│   ├── models.py
-│   ├── forms.py
-│   ├── views.py
-│   └── urls.py
-│
-├── predictions/
-│   ├── models.py
-│   ├── forms.py
-│   ├── views.py
-│   └── urls.py
-│
-├── reports/
-│   ├── views.py
-│   └── urls.py
-│
-├── hic_project/
-│   ├── settings.py
-│   ├── urls.py
-│   ├── asgi.py
-│   └── wsgi.py
-│
-├── templates/
-│   ├── accounts/
-│   ├── dashboard/
-│   ├── datasets/
-│   ├── models_app/
-│   ├── predictions/
-│   └── reports/
-│
-├── Sample_Datasets/
-├── Screenshots/
-│
-├── generate_dataset.py
-├── manage.py
-├── requirements.txt
-├── HIC_Dataset_Report.pdf
-├── HIC_Model_Report.pdf
-└── hic_project_process.txt
+<img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/512a1fe5-89e5-462d-b6b6-67dac104b0d4" />
+
 ⚙️ Installation & Setup
 1. Clone the Repository
 git clone https://github.com/valabojusumanth10/Prediction-of-Head-Injury-Criteria.git
