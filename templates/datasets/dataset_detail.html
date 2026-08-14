@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+{% block title %}Dataset Detail{% endblock %}
+{% block page_title %}Dataset Detail{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h2><i class="fas fa-database me-2"></i>{{ dataset.name }}</h2>
+            <p>{{ dataset.description|default:"No description" }}</p>
+        </div>
+        <a href="{% url 'datasets:dataset_list' %}" class="btn btn-secondary px-4" style="border-radius:10px;">
+            <i class="fas fa-arrow-left me-2"></i>Back
+        </a>
+    </div>
+</div>
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="card-modern p-4 text-center">
+            <div style="font-size:2rem;font-weight:800;color:#0f3460;">{{ dataset.total_records }}</div>
+            <div style="font-size:0.8rem;color:#6c757d;font-weight:600;">TOTAL RECORDS</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card-modern p-4 text-center">
+            <div style="font-size:2rem;font-weight:800;color:#2e7d32;">{{ dataset.processed_records }}</div>
+            <div style="font-size:0.8rem;color:#6c757d;font-weight:600;">PROCESSED</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card-modern p-4 text-center">
+            <div style="font-size:1.2rem;font-weight:800;color:{% if dataset.status == 'processed' %}#2e7d32{% else %}#e65100{% endif %};">
+                {{ dataset.status|upper }}
+            </div>
+            <div style="font-size:0.8rem;color:#6c757d;font-weight:600;">STATUS</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card-modern p-4 text-center">
+            <div style="font-size:1rem;font-weight:800;color:#1565c0;">{{ dataset.file_type|upper }}</div>
+            <div style="font-size:0.8rem;color:#6c757d;font-weight:600;">FILE TYPE</div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    {% if not dataset.is_preprocessed %}
+    <div class="col-auto">
+        <a href="{% url 'datasets:preprocess_dataset' dataset.pk %}" class="btn btn-highlight px-4" style="border-radius:10px;" onclick="return confirm('Start preprocessing?')">
+            <i class="fas fa-cogs me-2"></i>Preprocess Data
+        </a>
+    </div>
+    {% endif %}
+    {% if dataset.is_preprocessed and not dataset.is_features_extracted %}
+    <div class="col-auto">
+        <a href="{% url 'datasets:extract_features' dataset.pk %}" class="btn btn-success px-4" style="border-radius:10px;">
+            <i class="fas fa-magic me-2"></i>Extract Features
+        </a>
+    </div>
+    {% endif %}
+    <div class="col-auto">
+        <a href="{% url 'datasets:dataset_delete' dataset.pk %}" class="btn btn-danger px-4" style="border-radius:10px;">
+            <i class="fas fa-trash me-2"></i>Delete Dataset
+        </a>
+    </div>
+</div>
+
+{% if dataset.preprocessing_notes %}
+<div class="alert alert-info mb-4" style="border-radius:12px;font-size:0.88rem;">
+    <i class="fas fa-info-circle me-2"></i><strong>Preprocessing Notes:</strong> {{ dataset.preprocessing_notes }}
+</div>
+{% endif %}
+
+{% if records %}
+<div class="card-modern">
+    <div class="p-3 border-bottom"><h6 class="fw-bold mb-0"><i class="fas fa-table me-2" style="color:#e94560;"></i>Sample Records (First 20)</h6></div>
+    <div class="table-responsive">
+        <table class="table table-modern mb-0" style="font-size:0.78rem;">
+            <thead>
+                <tr>
+                    <th>Length</th><th>Width</th><th>Thickness</th><th>Density</th>
+                    <th>E-Modulus</th><th>Poisson</th><th>Yield</th><th>Velocity</th>
+                    <th>Angle</th><th>Mass</th><th>Stiffness</th><th>Energy</th>
+                    <th style="background:#e94560;">HIC Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in records %}
+                <tr>
+                    <td>{{ r.hood_length }}</td><td>{{ r.hood_width }}</td><td>{{ r.hood_thickness }}</td>
+                    <td>{{ r.material_density }}</td><td>{{ r.youngs_modulus }}</td><td>{{ r.poisson_ratio }}</td>
+                    <td>{{ r.yield_strength }}</td><td>{{ r.impact_velocity }}</td><td>{{ r.impact_angle }}</td>
+                    <td>{{ r.hood_mass }}</td><td>{{ r.stiffness }}</td><td>{{ r.energy_absorption }}</td>
+                    <td><strong style="color:#e94560;">{{ r.hic_value }}</strong></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

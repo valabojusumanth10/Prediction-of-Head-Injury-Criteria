@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% block title %}Reports{% endblock %}
+{% block page_title %}Reports{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h2><i class="fas fa-file-alt me-2"></i>System Reports</h2>
+    <p>Download and view comprehensive system reports</p>
+</div>
+<div class="row g-4">
+    {% if user.role == 'admin' %}
+    <div class="col-md-4">
+        <div class="card-modern p-4 text-center">
+            <div style="width:70px;height:70px;background:linear-gradient(135deg,#e3f2fd,#bbdefb);border-radius:20px;display:flex;align-items:center;justify-content:center;color:#1565c0;font-size:1.8rem;margin:0 auto 16px;">
+                <i class="fas fa-database"></i>
+            </div>
+            <h6 class="fw-bold mb-2">Dataset Report</h6>
+            <p class="text-muted mb-3" style="font-size:0.85rem;">Overview of all uploaded datasets, preprocessing status, and record counts.</p>
+            <a href="{% url 'reports:dataset_report' %}" class="btn btn-highlight w-100 mb-2" style="border-radius:10px;">
+                <i class="fas fa-eye me-2"></i>View Report
+            </a>
+            <a href="{% url 'reports:download_dataset_pdf' %}" class="btn btn-outline-secondary w-100" style="border-radius:10px;">
+                <i class="fas fa-file-pdf me-2"></i>Download PDF
+            </a>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card-modern p-4 text-center">
+            <div style="width:70px;height:70px;background:linear-gradient(135deg,#f3e5f5,#e1bee7);border-radius:20px;display:flex;align-items:center;justify-content:center;color:#6a1b9a;font-size:1.8rem;margin:0 auto 16px;">
+                <i class="fas fa-brain"></i>
+            </div>
+            <h6 class="fw-bold mb-2">Model Performance Report</h6>
+            <p class="text-muted mb-3" style="font-size:0.85rem;">Accuracy, MSE, R² score, and performance metrics for all trained models.</p>
+            <a href="{% url 'reports:model_report' %}" class="btn btn-highlight w-100 mb-2" style="border-radius:10px;">
+                <i class="fas fa-eye me-2"></i>View Report
+            </a>
+            <a href="{% url 'reports:download_model_pdf' %}" class="btn btn-outline-secondary w-100" style="border-radius:10px;">
+                <i class="fas fa-file-pdf me-2"></i>Download PDF
+            </a>
+        </div>
+    </div>
+    {% endif %}
+    <div class="col-md-4">
+        <div class="card-modern p-4 text-center">
+            <div style="width:70px;height:70px;background:linear-gradient(135deg,#fce4ec,#f8bbd9);border-radius:20px;display:flex;align-items:center;justify-content:center;color:#c62828;font-size:1.8rem;margin:0 auto 16px;">
+                <i class="fas fa-chart-line"></i>
+            </div>
+            <h6 class="fw-bold mb-2">Prediction Report</h6>
+            <p class="text-muted mb-3" style="font-size:0.85rem;">Summary of HIC predictions with safety analysis and distribution.</p>
+            <a href="{% url 'reports:prediction_report' %}" class="btn btn-accent w-100 mb-2" style="border-radius:10px;">
+                <i class="fas fa-eye me-2"></i>View Report
+            </a>
+            <a href="{% url 'reports:download_prediction_pdf' %}" class="btn btn-outline-danger w-100" style="border-radius:10px;">
+                <i class="fas fa-file-pdf me-2"></i>Download PDF
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

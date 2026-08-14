@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+{% block title %}Train Model{% endblock %}
+{% block page_title %}Train New Model{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h2><i class="fas fa-brain me-2"></i>Train Neural Network Model</h2>
+    <p>Configure and train a deep neural network for HIC prediction</p>
+</div>
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card-modern p-4">
+            <form method="post" id="trainForm">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label class="form-label fw-bold" style="font-size:0.85rem;">Model Name *</label>
+                    <input type="text" name="name" class="form-control"
+                           placeholder="e.g. HIC-DNN-v1" style="border-radius:10px;" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold" style="font-size:0.85rem;">Description</label>
+                    <textarea name="description" class="form-control" rows="2"
+                              placeholder="Optional description..." style="border-radius:10px;"></textarea>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold" style="font-size:0.85rem;">Training Dataset *</label>
+                    <select name="dataset" class="form-control" style="border-radius:10px;" required>
+                        <option value="">-- Select a preprocessed dataset --</option>
+                        {% for ds in form.dataset.field.queryset %}
+                        <option value="{{ ds.pk }}">{{ ds.name }} ({{ ds.processed_records }} records)</option>
+                        {% endfor %}
+                    </select>
+                    {% if not form.dataset.field.queryset %}
+                    <small class="text-danger">
+                        No preprocessed datasets available.
+                        <a href="{% url 'datasets:dataset_list' %}">Upload and preprocess a dataset first.</a>
+                    </small>
+                    {% endif %}
+                </div>
+                <hr class="my-4">
+                <h6 class="fw-bold mb-3">
+                    <i class="fas fa-sliders-h me-2" style="color:#e94560;"></i>Model Configuration
+                </h6>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold" style="font-size:0.85rem;">Number of Hidden Layers</label>
+                        <input type="number" name="num_layers" class="form-control"
+                               value="4" min="2" max="10" style="border-radius:10px;">
+                        <small class="text-muted">Recommended: 3–6 layers</small>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold" style="font-size:0.85rem;">Activation Function</label>
+                        <select name="activation_function" class="form-control" style="border-radius:10px;">
+                            <option value="relu">ReLU (Recommended)</option>
+                            <option value="tanh">Tanh</option>
+                            <option value="sigmoid">Sigmoid</option>
+                            <option value="linear">Linear</option>
+                            <option value="elu">ELU</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold" style="font-size:0.85rem;">Learning Rate</label>
+                        <input type="number" name="learning_rate" class="form-control"
+                               value="0.001" step="0.0001" min="0.0001" style="border-radius:10px;">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold" style="font-size:0.85rem;">Training Epochs</label>
+                        <input type="number" name="epochs" class="form-control"
+                               value="200" min="10" max="1000" style="border-radius:10px;">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold" style="font-size:0.85rem;">Batch Size</label>
+                        <input type="number" name="batch_size" class="form-control"
+                               value="32" min="8" style="border-radius:10px;">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold" style="font-size:0.85rem;">Test Split Ratio</label>
+                        <input type="number" name="test_size" class="form-control"
+                               value="0.2" step="0.05" min="0.1" max="0.5" style="border-radius:10px;">
+                        <small class="text-muted">0.2 = 20% test data</small>
+                    </div>
+                </div>
+                <div class="alert alert-warning mt-4" style="border-radius:10px;font-size:0.85rem;">
+                    <i class="fas fa-clock me-2"></i>
+                    <strong>Note:</strong> Training may take 1–5 minutes. Do not close the browser.
+                </div>
+                <div class="d-flex gap-2 mt-3">
+                    <button type="submit" class="btn btn-accent px-5 py-2"
+                            style="border-radius:10px;font-weight:700;" id="trainBtn">
+                        <i class="fas fa-play me-2"></i>Start Training
+                    </button>
+                    <a href="{% url 'models_app:model_list' %}" class="btn btn-secondary px-4"
+                       style="border-radius:10px;">
+                        <i class="fas fa-arrow-left me-2"></i>Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+document.getElementById('trainForm').addEventListener('submit', function() {
+    const btn = document.getElementById('trainBtn');
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Training in progress...';
+    btn.disabled = true;
+});
+</script>
+{% endblock %}

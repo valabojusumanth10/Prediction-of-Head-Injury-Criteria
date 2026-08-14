@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+{% block title %}Prediction History{% endblock %}
+{% block page_title %}Prediction History{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h2><i class="fas fa-history me-2"></i>Prediction History</h2>
+            <p>{% if user.role == 'admin' %}All system predictions ({{ total }} total){% else %}Your prediction records ({{ total }} total){% endif %}</p>
+        </div>
+        <div class="d-flex gap-2">
+            {% if user.role != 'admin' %}
+            <a href="{% url 'predictions:predict' %}" class="btn btn-accent px-4" style="border-radius:10px;">
+                <i class="fas fa-plus me-2"></i>New Prediction
+            </a>
+            {% endif %}
+            <a href="{% url 'reports:download_prediction_pdf' %}" class="btn btn-highlight px-4" style="border-radius:10px;">
+                <i class="fas fa-file-pdf me-2"></i>Download PDF
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Filter bar -->
+<div class="card-modern p-3 mb-4 d-flex align-items-center gap-3" style="flex-wrap:wrap;">
+    <span style="font-size:0.85rem;font-weight:600;color:#6c757d;">Filter by safety:</span>
+    <a href="{% url 'predictions:prediction_history' %}" class="btn btn-sm {% if not safety_filter %}btn-highlight{% else %}btn-outline-secondary{% endif %}" style="border-radius:8px;">All</a>
+    <a href="?safety=safe"    class="btn btn-sm {% if safety_filter == 'safe'    %}btn-success{% else %}btn-outline-success{% endif %}"  style="border-radius:8px;">✅ Safe</a>
+    <a href="?safety=warning" class="btn btn-sm {% if safety_filter == 'warning' %}btn-warning text-dark{% else %}btn-outline-warning{% endif %}" style="border-radius:8px;">⚠️ Warning</a>
+    <a href="?safety=danger"  class="btn btn-sm {% if safety_filter == 'danger'  %}btn-danger{% else %}btn-outline-danger{% endif %}"   style="border-radius:8px;">❌ Danger</a>
+</div>
+
+<div class="card-modern">
+    <div class="table-responsive">
+        <table class="table table-modern mb-0">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    {% if user.role == 'admin' %}<th>User</th>{% endif %}
+                    <th>HIC Value</th>
+                    <th>Safety</th>
+                    <th>Velocity (m/s)</th>
+                    <th>Angle (°)</th>
+                    <th>Density (kg/m³)</th>
+                    <th>Model Used</th>
+                    <th>Date</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in predictions %}
+                <tr>
+                    <td>#{{ p.id }}</td>
+                    {% if user.role == 'admin' %}
+                    <td>{{ p.user.get_full_name|default:p.user.username }}</td>
+                    {% endif %}
+                    <td>
+                        <strong style="font-size:1rem;color:{% if p.safety_status == 'safe' %}#06d6a0{% elif p.safety_status == 'warning' %}#e65100{% else %}#ef476f{% endif %};">
+                            {{ p.predicted_hic|floatformat:2 }}
+                        </strong>
+                    </td>
+                    <td>
+                        <span class="badge {% if p.safety_status == 'safe' %}badge-safe{% elif p.safety_status == 'warning' %}badge-warning-custom{% else %}badge-danger-custom{% endif %}" style="border-radius:6px;font-size:0.75rem;">
+                            {% if p.safety_status == 'safe' %}✅{% elif p.safety_status == 'warning' %}⚠️{% else %}❌{% endif %}
+                            {{ p.safety_status|upper }}
+                        </span>
+                    </td>
+                    <td>{{ p.impact_velocity }}</td>
+                    <td>{{ p.impact_angle }}</td>
+                    <td>{{ p.material_density }}</td>
+                    <td>{{ p.model_used.name|default:"N/A"|truncatechars:16 }}</td>
+                    <td>{{ p.created_at|date:"M d, Y" }}</td>
+                    <td>
+                        <a href="{% url 'predictions:prediction_detail' p.pk %}" class="btn btn-sm btn-highlight" style="border-radius:7px;" title="View Detail">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="{% if user.role == 'admin' %}10{% else %}9{% endif %}" class="text-center text-muted py-4">
+                        No predictions found.
+                        {% if not safety_filter %}
+                        <a href="{% url 'predictions:predict' %}">Make your first prediction!</a>
+                        {% else %}
+                        <a href="{% url 'predictions:prediction_history' %}">Clear filter</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    {% if predictions.has_other_pages %}
+    <div class="p-3 border-top d-flex justify-content-between align-items-center">
+        <small class="text-muted">
+            Page {{ predictions.number }} of {{ predictions.paginator.num_pages }}
+            ({{ total }} total records)
+        </small>
+        <nav>
+            <ul class="pagination pagination-sm mb-0" style="gap:4px;">
+                {% if predictions.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ predictions.previous_page_number }}{% if safety_filter %}&safety={{ safety_filter }}{% endif %}" style="border-radius:8px;">
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
+                </li>
+                {% endif %}
+                {% for num in predictions.paginator.page_range %}
+                    {% if predictions.number == num %}
+                    <li class="page-item active">
+                        <span class="page-link" style="border-radius:8px;background:#e94560;border-color:#e94560;">{{ num }}</span>
+                    </li>
+                    {% elif num > predictions.number|add:'-3' and num < predictions.number|add:'3' %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}{% if safety_filter %}&safety={{ safety_filter }}{% endif %}" style="border-radius:8px;">{{ num }}</a>
+                    </li>
+                    {% endif %}
+                {% endfor %}
+                {% if predictions.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ predictions.next_page_number }}{% if safety_filter %}&safety={{ safety_filter }}{% endif %}" style="border-radius:8px;">
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

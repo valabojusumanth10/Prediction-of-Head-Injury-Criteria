@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% block title %}My Profile — HIC Predict{% endblock %}
+{% block page_title %}My Profile{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h2><i class="fas fa-user-circle me-2"></i>My Profile</h2>
+    <p>Manage your personal information and account settings</p>
+</div>
+<div class="row g-4">
+    <div class="col-md-4">
+        <div class="card-modern p-4 text-center">
+            <div style="width:80px;height:80px;background:linear-gradient(135deg,#e94560,#ff6b6b);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:2rem;font-weight:800;margin:0 auto 16px;">
+                {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
+            </div>
+            <h5 class="fw-bold mb-1">{{ user.get_full_name|default:user.username }}</h5>
+            <span class="badge" style="background:{% if user.role == 'admin' %}#0f3460{% else %}#e94560{% endif %};color:#fff;border-radius:8px;padding:4px 12px;">
+                {{ user.role|upper }}
+            </span>
+            <hr>
+            <div class="text-start" style="font-size:0.85rem;">
+                <div class="mb-2"><i class="fas fa-envelope me-2 text-muted"></i>{{ user.email|default:"Not set" }}</div>
+                <div class="mb-2"><i class="fas fa-phone me-2 text-muted"></i>{{ user.phone|default:"Not set" }}</div>
+                <div class="mb-2"><i class="fas fa-calendar me-2 text-muted"></i>Joined {{ user.created_at|date:"M d, Y" }}</div>
+            </div>
+            <a href="{% url 'accounts:change_password' %}" class="btn btn-outline-danger btn-sm w-100 mt-2" style="border-radius:8px;">
+                <i class="fas fa-key me-1"></i>Change Password
+            </a>
+        </div>
+    </div>
+    <div class="col-md-8">
+        <div class="card-modern p-4">
+            <h5 class="fw-bold mb-4"><i class="fas fa-edit me-2" style="color:#e94560;"></i>Edit Profile</h5>
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="row g-3">
+                    <div class="col-6">
+                        <label class="form-label fw-600" style="font-size:0.85rem;">First Name</label>
+                        <input type="text" name="first_name" class="form-control" value="{{ user.first_name }}" style="border-radius:10px;">
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label fw-600" style="font-size:0.85rem;">Last Name</label>
+                        <input type="text" name="last_name" class="form-control" value="{{ user.last_name }}" style="border-radius:10px;">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-600" style="font-size:0.85rem;">Email Address</label>
+                        <input type="email" name="email" class="form-control" value="{{ user.email }}" style="border-radius:10px;">
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label fw-600" style="font-size:0.85rem;">Phone</label>
+                        <input type="text" name="phone" class="form-control" value="{{ user.phone|default:'' }}" style="border-radius:10px;">
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label fw-600" style="font-size:0.85rem;">Profile Picture</label>
+                        <input type="file" name="profile_picture" class="form-control" style="border-radius:10px;">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-600" style="font-size:0.85rem;">Address</label>
+                        <textarea name="address" class="form-control" rows="3" style="border-radius:10px;">{{ user.address|default:'' }}</textarea>
+                    </div>
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-accent px-4" style="border-radius:10px;">
+                            <i class="fas fa-save me-2"></i>Save Changes
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

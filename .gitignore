@@ -1,0 +1,21 @@
+# Python virtual environment
+hic_env/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Django
+*.sqlite3
+
+# Environment/secrets
+.env
+
+# Generated/static files
+staticfiles/
+
+# User-uploaded/generated media
+media/
+
+# Large video file
+Screen_Record.mp4

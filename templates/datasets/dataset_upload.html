@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}Upload Dataset{% endblock %}
+{% block page_title %}Upload Dataset{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h2><i class="fas fa-upload me-2"></i>Upload Dataset</h2>
+    <p>Upload vehicle hood dataset in CSV or Excel format</p>
+</div>
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card-modern p-4">
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label class="form-label fw-600">Dataset Name *</label>
+                    <input type="text" name="name" class="form-control" placeholder="e.g., Vehicle Hood Data 2024" style="border-radius:10px;" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-600">Description</label>
+                    <textarea name="description" class="form-control" rows="3" placeholder="Brief description of this dataset..." style="border-radius:10px;"></textarea>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-600">Dataset File (CSV or Excel) *</label>
+                    <input type="file" name="file" class="form-control" accept=".csv,.xlsx,.xls" style="border-radius:10px;" required>
+                    <small class="text-muted">Expected columns: hood_length, hood_width, hood_thickness, material_density, youngs_modulus, poisson_ratio, yield_strength, impact_velocity, impact_angle, hood_mass, stiffness, energy_absorption, hic_value</small>
+                </div>
+                <div class="alert alert-info" style="border-radius:10px;font-size:0.85rem;">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>Column Requirements:</strong> Your dataset must have 13 columns in order:
+                    hood_length, hood_width, hood_thickness, material_density, youngs_modulus, poisson_ratio, yield_strength, impact_velocity, impact_angle, hood_mass, stiffness, energy_absorption, hic_value
+                </div>
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-accent px-4" style="border-radius:10px;">
+                        <i class="fas fa-upload me-2"></i>Upload
+                    </button>
+                    <a href="{% url 'datasets:dataset_list' %}" class="btn btn-secondary px-4" style="border-radius:10px;">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

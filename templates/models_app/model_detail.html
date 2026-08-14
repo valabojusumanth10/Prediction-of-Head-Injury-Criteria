@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+{% block title %}Model Detail{% endblock %}
+{% block page_title %}Model Detail{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h2><i class="fas fa-brain me-2"></i>{{ model.name }}</h2>
+            <p>{{ model.description|default:"Trained neural network model for HIC prediction" }}</p>
+        </div>
+        <div class="d-flex gap-2">
+            {% if model.status == 'trained' %}
+            <a href="{% url 'models_app:model_evaluate' model.pk %}"
+               class="btn btn-highlight px-4" style="border-radius:10px;">
+                <i class="fas fa-chart-bar me-2"></i>Evaluate Model
+            </a>
+            {% endif %}
+            <a href="{% url 'models_app:model_list' %}"
+               class="btn btn-secondary px-4" style="border-radius:10px;">
+                <i class="fas fa-arrow-left me-2"></i>Back
+            </a>
+        </div>
+    </div>
+</div>
+
+{% if model_metrics %}
+<div class="row g-4 mb-4">
+    {% for label, val, color in model_metrics %}
+    <div class="col-sm-6 col-xl-2">
+        <div class="card-modern p-3 text-center">
+            <div style="font-size:1.4rem;font-weight:800;color:{{ color }};">{{ val }}</div>
+            <div style="font-size:0.72rem;color:#6c757d;font-weight:700;
+                        text-transform:uppercase;letter-spacing:.5px;">{{ label }}</div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="card-modern p-4">
+            <h6 class="fw-bold mb-3">
+                <i class="fas fa-cogs me-2" style="color:#e94560;"></i>Configuration
+            </h6>
+            <table class="table" style="font-size:0.88rem;">
+                <tr><td class="text-muted" style="width:45%">Dataset</td>
+                    <td><strong>{{ model.dataset.name|default:"N/A" }}</strong></td></tr>
+                <tr><td class="text-muted">Hidden Layers</td>
+                    <td><strong>{{ model.num_layers }}</strong></td></tr>
+                <tr><td class="text-muted">Activation</td>
+                    <td><strong>{{ model.activation_function|upper }}</strong></td></tr>
+                <tr><td class="text-muted">Learning Rate</td>
+                    <td><strong>{{ model.learning_rate }}</strong></td></tr>
+                <tr><td class="text-muted">Epochs</td>
+                    <td><strong>{{ model.epochs }}</strong></td></tr>
+                <tr><td class="text-muted">Batch Size</td>
+                    <td><strong>{{ model.batch_size }}</strong></td></tr>
+                <tr><td class="text-muted">Test Split</td>
+                    <td><strong>{{ model.test_size }}</strong></td></tr>
+                <tr><td class="text-muted">Trained By</td>
+                    <td><strong>{{ model.trained_by.get_full_name|default:model.trained_by.username|default:"N/A" }}</strong></td></tr>
+                <tr><td class="text-muted">Created</td>
+                    <td><strong>{{ model.created_at|date:"M d, Y H:i" }}</strong></td></tr>
+                <tr><td class="text-muted">Status</td>
+                    <td>
+                        <span class="badge" style="border-radius:6px;
+                            background:{% if model.status == 'trained' %}#d4edda{% elif model.status == 'failed' %}#f8d7da{% elif model.status == 'training' %}#fff3cd{% else %}#e3f2fd{% endif %};
+                            color:{% if model.status == 'trained' %}#155724{% elif model.status == 'failed' %}#721c24{% elif model.status == 'training' %}#856404{% else %}#1565c0{% endif %};">
+                            {{ model.status|upper }}
+                        </span>
+                        {% if model.is_active %}
+                        <span class="badge ms-1" style="background:#06d6a0;color:#fff;border-radius:6px;">
+                            ACTIVE
+                        </span>
+                        {% endif %}
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card-modern p-4">
+            <h6 class="fw-bold mb-3">
+                <i class="fas fa-chart-bar me-2" style="color:#e94560;"></i>Performance Metrics
+            </h6>
+            {% if model.status == 'trained' %}
+            <table class="table" style="font-size:0.88rem;">
+                <tr><td class="text-muted" style="width:45%">Accuracy</td>
+                    <td><strong style="color:#2e7d32;font-size:1.1rem;">{{ model.accuracy|floatformat:2 }}%</strong></td></tr>
+                <tr><td class="text-muted">MSE</td>
+                    <td><strong style="color:#e94560;">{{ model.mse|floatformat:6 }}</strong></td></tr>
+                <tr><td class="text-muted">RMSE</td>
+                    <td><strong style="color:#e65100;">{{ model.rmse|floatformat:6 }}</strong></td></tr>
+                <tr><td class="text-muted">MAE</td>
+                    <td><strong style="color:#1565c0;">{{ model.mae|floatformat:6 }}</strong></td></tr>
+                <tr><td class="text-muted">R² Score</td>
+                    <td><strong style="color:#00695c;">{{ model.r2_score|floatformat:6 }}</strong></td></tr>
+                <tr><td class="text-muted">Correlation</td>
+                    <td><strong style="color:#6a1b9a;">{{ model.correlation|floatformat:6 }}</strong></td></tr>
+            </table>
+            <a href="{% url 'models_app:model_evaluate' model.pk %}"
+               class="btn btn-highlight w-100 mt-2" style="border-radius:10px;">
+                <i class="fas fa-microscope me-2"></i>Run Full Evaluation
+            </a>
+            {% else %}
+            <div class="p-3 rounded" style="background:#f8f9fa;font-size:0.85rem;color:#6c757d;">
+                <i class="fas fa-info-circle me-2"></i>
+                {% if model.training_log %}
+                    {{ model.training_log|linebreaksbr }}
+                {% else %}
+                    Metrics not available. Model status: {{ model.status }}
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% if model.training_log and model.status == 'trained' %}
+<div class="card-modern p-4 mt-4">
+    <h6 class="fw-bold mb-3">
+        <i class="fas fa-terminal me-2" style="color:#e94560;"></i>Training Log
+    </h6>
+    <pre style="background:#1a1a2e;color:#e0e0e0;border-radius:12px;padding:16px;
+                font-size:0.82rem;overflow-x:auto;margin:0;">{{ model.training_log }}</pre>
+</div>
+{% endif %}
+{% endblock %}

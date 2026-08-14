@@ -1,0 +1,166 @@
+HIC PREDICTION USING DEEP NEURAL NETWORK Step-by-Step Project Process
+Document
+
+  ------------------------------------------------------------
+  STEP 1 – START THE PROJECT
+  ------------------------------------------------------------
+  Open terminal and run the project:
+
+  cd “G:_Prediction_Project” hic_env python manage.py
+  runserver
+
+  Open browser: http://127.0.0.1:8000
+  ------------------------------------------------------------
+
+STEP 2 – LOGIN AS ADMIN
+
+Admin manages the dataset and model training.
+
+Example login: Username: admin Password: admin123
+
+Admin dashboard will open.
+
+  ------------------------------------------------------------
+  STEP 3 – UPLOAD VEHICLE HOOD DATASET
+  ------------------------------------------------------------
+  Admin uploads the dataset used to train the model.
+
+  Navigate to: /dataset/upload
+
+  Example dataset values:
+
+  hood_thickness, hood_stiffness, material_density,
+  youngs_modulus, impact_speed, impact_angle, hood_mass,
+  penetration_depth, energy_absorption, HIC
+
+  1.2,350,2700,69,35,45,12,8.5,120,650
+  1.5,420,7800,200,40,50,14,7.8,150,720
+  1.1,300,2500,65,30,40,11,9.2,110,580
+  1.8,500,7850,210,45,55,16,6.5,180,810
+  1.3,380,2700,70,38,48,13,8.0,135,690
+  1.6,450,7700,205,42,52,15,7.2,160,750
+  1.4,390,2750,72,36,47,13.5,8.1,140,705
+  1.7,470,7800,208,44,53,15.5,6.9,170,790
+  1.2,360,2600,68,34,46,12.2,8.4,125,670
+  1.5,430,7900,202,41,51,14.3,7.5,155,735
+
+  Click Upload Dataset.
+  ------------------------------------------------------------
+
+STEP 4 – DATA PREPROCESSING
+
+System automatically processes the uploaded dataset.
+
+Operations: • Remove noise from data • Normalize numeric values •
+Convert dataset into machine learning format
+
+Example processed values: Normalized Impact Speed: 0.72 Normalized Hood
+Stiffness: 0.64 Normalized Penetration Depth: 0.58
+
+  ------------------------------------------------------------
+  STEP 5 – FEATURE EXTRACTION
+  ------------------------------------------------------------
+  System extracts important features from dataset.
+
+  Examples: • Material Strength Index • Impact Energy • Hood
+  Deformation Ratio • Average Penetration Depth
+  ------------------------------------------------------------
+
+STEP 6 – TRAIN DEEP NEURAL NETWORK MODEL
+
+Navigate to: /model/train
+
+Training parameters example: Epochs: 50 Batch Size: 32 Learning Rate:
+0.001
+
+Example training output:
+
+Epoch 1 - Loss: 0.56 Epoch 10 - Loss: 0.28 Epoch 25 - Loss: 0.12 Epoch
+50 - Loss: 0.05
+
+  ------------------------------------------------------------
+  STEP 7 – MODEL EVALUATION
+  ------------------------------------------------------------
+  Evaluation metrics:
+
+  Mean Squared Error (MSE) Correlation Score Prediction
+  Accuracy
+
+  Example results:
+
+  MSE: 0.021 Accuracy: 94.3% Correlation: 0.92
+  ------------------------------------------------------------
+
+STEP 8 – PREDICT HIC FOR NEW DESIGN
+
+Navigate to: /hic/predict
+
+Input example:
+
+Hood Thickness: 1.4 Hood Stiffness: 390 Material Density: 2700 Youngs
+Modulus: 70 Impact Speed: 36 Impact Angle: 47 Hood Mass: 13 Penetration
+Depth: 8.1 Energy Absorption: 140
+
+Click Predict HIC.
+
+  ------------------------------------------------------------
+  STEP 9 – PREDICTION RESULT
+  ------------------------------------------------------------
+  Example output:
+
+  Predicted HIC Value: 705
+
+  Interpretation:
+
+  HIC < 650 → Low injury risk 650–800 → Moderate injury risk >
+  800 → High injury risk
+
+  Example result: Safety Level: Moderate Injury Risk
+  ------------------------------------------------------------
+
+STEP 10 – VISUALIZATION AND REPORTS
+
+System generates graphs such as:
+
+• HIC vs Impact Speed • Hood Stiffness vs Injury Risk • Model Accuracy
+Graph
+
+Users can generate report:
+
+Generate PDF Report
+
+Report includes: • Input parameters • Predicted HIC value • Safety
+classification • Graphical analysis
+
+  ------------------------------------------------------------
+  STEP 11 – SYSTEM FEEDBACK
+  ------------------------------------------------------------
+  Engineers analyze results.
+
+  Example decision rules:
+
+  If HIC > 800 → redesign hood material
+
+  If HIC < 650 → design considered safe
+  ------------------------------------------------------------
+
+COMPLETE PROJECT FLOW
+
+Upload Dataset
+      ↓
+Data Preprocessing
+      ↓
+Feature Extraction
+      ↓
+Train Deep Neural Network
+      ↓
+Model Evaluation
+      ↓
+Predict HIC Value
+      ↓
+Result Interpretation
+      ↓
+Safety Analysis Report
+
+
+End of Document

@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% block title %}Prediction Report{% endblock %}
+{% block page_title %}Prediction Report{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h2><i class="fas fa-chart-line me-2"></i>Prediction Report</h2>
+            <p>HIC prediction summary and safety analysis</p>
+        </div>
+        <a href="{% url 'reports:download_prediction_pdf' %}" class="btn btn-accent px-4" style="border-radius:10px;">
+            <i class="fas fa-file-pdf me-2"></i>Download PDF
+        </a>
+    </div>
+</div>
+<div class="row g-4 mb-4">
+    <div class="col-sm-4">
+        <div class="card-modern stat-card stat-green">
+            <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+            <div class="stat-number">{{ safe }}</div>
+            <div class="stat-label">Safe Designs</div>
+        </div>
+    </div>
+    <div class="col-sm-4">
+        <div class="card-modern stat-card stat-orange">
+            <div class="stat-icon"><i class="fas fa-exclamation-triangle"></i></div>
+            <div class="stat-number">{{ warning }}</div>
+            <div class="stat-label">Warning</div>
+        </div>
+    </div>
+    <div class="col-sm-4">
+        <div class="card-modern stat-card stat-red">
+            <div class="stat-icon"><i class="fas fa-times-circle"></i></div>
+            <div class="stat-number">{{ danger }}</div>
+            <div class="stat-label">Danger</div>
+        </div>
+    </div>
+</div>
+<div class="card-modern">
+    <div class="table-responsive">
+        <table class="table table-modern mb-0" style="font-size:0.85rem;">
+            <thead>
+                <tr><th>#</th><th>User</th><th>HIC Value</th><th>Safety</th><th>Velocity</th><th>Model</th><th>Date</th></tr>
+            </thead>
+            <tbody>
+                {% for p in predictions %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ p.user.get_full_name|default:p.user.username }}</td>
+                    <td><strong>{{ p.predicted_hic|floatformat:2 }}</strong></td>
+                    <td>
+                        <span class="badge {% if p.safety_status == 'safe' %}badge-safe{% elif p.safety_status == 'warning' %}badge-warning-custom{% else %}badge-danger-custom{% endif %}" style="border-radius:6px;">
+                            {{ p.safety_status|upper }}
+                        </span>
+                    </td>
+                    <td>{{ p.impact_velocity }} m/s</td>
+                    <td>{{ p.model_used.name|default:"N/A"|truncatechars:15 }}</td>
+                    <td>{{ p.created_at|date:"M d, Y" }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="7" class="text-center text-muted py-4">No predictions found.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

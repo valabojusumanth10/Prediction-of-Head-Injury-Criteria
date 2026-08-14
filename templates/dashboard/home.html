@@ -1,0 +1,249 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard — HIC Predict{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+{% block content %}
+{% if user.role == 'admin' %}
+<!-- Admin Dashboard -->
+<div class="page-header">
+    <h2><i class="fas fa-th-large me-2"></i>Admin Dashboard</h2>
+    <p>Welcome back, {{ user.get_full_name|default:user.username }}! Here's your system overview.</p>
+</div>
+<div class="row g-4 mb-4">
+    <div class="col-sm-6 col-xl-2">
+        <div class="card-modern stat-card stat-blue">
+            <div class="stat-icon"><i class="fas fa-users"></i></div>
+            <div class="stat-number">{{ total_users }}</div>
+            <div class="stat-label">Total Users</div>
+            <div class="stat-bg"><i class="fas fa-users"></i></div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-2">
+        <div class="card-modern stat-card stat-teal">
+            <div class="stat-icon"><i class="fas fa-database"></i></div>
+            <div class="stat-number">{{ total_datasets }}</div>
+            <div class="stat-label">Datasets</div>
+            <div class="stat-bg"><i class="fas fa-database"></i></div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-2">
+        <div class="card-modern stat-card stat-purple">
+            <div class="stat-icon"><i class="fas fa-brain"></i></div>
+            <div class="stat-number">{{ total_models }}</div>
+            <div class="stat-label">ML Models</div>
+            <div class="stat-bg"><i class="fas fa-brain"></i></div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-2">
+        <div class="card-modern stat-card stat-orange">
+            <div class="stat-icon"><i class="fas fa-chart-line"></i></div>
+            <div class="stat-number">{{ total_predictions }}</div>
+            <div class="stat-label">Predictions</div>
+            <div class="stat-bg"><i class="fas fa-chart-line"></i></div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-2">
+        <div class="card-modern stat-card stat-green">
+            <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+            <div class="stat-number">{{ safe_count }}</div>
+            <div class="stat-label">Safe Results</div>
+            <div class="stat-bg"><i class="fas fa-check"></i></div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-2">
+        <div class="card-modern stat-card stat-red">
+            <div class="stat-icon"><i class="fas fa-exclamation-circle"></i></div>
+            <div class="stat-number">{{ danger_count }}</div>
+            <div class="stat-label">Danger Alerts</div>
+            <div class="stat-bg"><i class="fas fa-exclamation"></i></div>
+        </div>
+    </div>
+</div>
+<div class="row g-4 mb-4">
+    <div class="col-md-5">
+        <div class="card-modern p-4">
+            <h6 class="fw-bold mb-3"><i class="fas fa-chart-pie me-2" style="color:#e94560;"></i>Safety Distribution</h6>
+            <canvas id="safetyChart" height="220"></canvas>
+        </div>
+    </div>
+    <div class="col-md-7">
+        <div class="card-modern p-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h6 class="fw-bold mb-0"><i class="fas fa-history me-2" style="color:#e94560;"></i>Recent Predictions</h6>
+                <a href="{% url 'predictions:prediction_history' %}" class="btn btn-sm btn-accent" style="border-radius:8px;">View All</a>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-modern mb-0" style="font-size:0.85rem;">
+                    <thead><tr><th>User</th><th>HIC Value</th><th>Safety</th><th>Date</th></tr></thead>
+                    <tbody>
+                        {% for p in recent_predictions %}
+                        <tr>
+                            <td>{{ p.user.get_full_name|default:p.user.username }}</td>
+                            <td><strong>{{ p.predicted_hic|floatformat:2 }}</strong></td>
+                            <td>
+                                <span class="badge {% if p.safety_status == 'safe' %}badge-safe{% elif p.safety_status == 'warning' %}badge-warning-custom{% else %}badge-danger-custom{% endif %}" style="border-radius:6px;font-size:0.75rem;">
+                                    {{ p.safety_status|upper }}
+                                </span>
+                            </td>
+                            <td>{{ p.created_at|date:"M d" }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="4" class="text-center text-muted">No predictions yet.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% if active_model %}
+<div class="card-modern p-4">
+    <h6 class="fw-bold mb-3"><i class="fas fa-brain me-2" style="color:#e94560;"></i>Active Model Performance</h6>
+    <div class="row g-3">
+        <div class="col-sm-2">
+            <div class="text-center p-3" style="background:#f8f9fa;border-radius:12px;">
+                <div style="font-size:1.4rem;font-weight:800;color:#0f3460;">{{ active_model.accuracy|floatformat:1 }}%</div>
+                <div style="font-size:0.75rem;color:#6c757d;font-weight:600;">ACCURACY</div>
+            </div>
+        </div>
+        <div class="col-sm-2">
+            <div class="text-center p-3" style="background:#f8f9fa;border-radius:12px;">
+                <div style="font-size:1.4rem;font-weight:800;color:#e94560;">{{ active_model.mse|floatformat:4 }}</div>
+                <div style="font-size:0.75rem;color:#6c757d;font-weight:600;">MSE</div>
+            </div>
+        </div>
+        <div class="col-sm-2">
+            <div class="text-center p-3" style="background:#f8f9fa;border-radius:12px;">
+                <div style="font-size:1.4rem;font-weight:800;color:#00695c;">{{ active_model.r2_score|floatformat:4 }}</div>
+                <div style="font-size:0.75rem;color:#6c757d;font-weight:600;">R² SCORE</div>
+            </div>
+        </div>
+        <div class="col-sm-2">
+            <div class="text-center p-3" style="background:#f8f9fa;border-radius:12px;">
+                <div style="font-size:1.4rem;font-weight:800;color:#6a1b9a;">{{ active_model.correlation|floatformat:4 }}</div>
+                <div style="font-size:0.75rem;color:#6c757d;font-weight:600;">CORRELATION</div>
+            </div>
+        </div>
+        <div class="col-sm-2">
+            <div class="text-center p-3" style="background:#f8f9fa;border-radius:12px;">
+                <div style="font-size:1.4rem;font-weight:800;color:#e65100;">{{ active_model.rmse|floatformat:4 }}</div>
+                <div style="font-size:0.75rem;color:#6c757d;font-weight:600;">RMSE</div>
+            </div>
+        </div>
+        <div class="col-sm-2">
+            <div class="text-center p-3" style="background:#f8f9fa;border-radius:12px;">
+                <div style="font-size:1.4rem;font-weight:800;color:#1565c0;">{{ active_model.mae|floatformat:4 }}</div>
+                <div style="font-size:0.75rem;color:#6c757d;font-weight:600;">MAE</div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% else %}
+<!-- User Dashboard -->
+<div class="page-header">
+    <h2><i class="fas fa-th-large me-2"></i>My Dashboard</h2>
+    <p>Welcome, {{ user.get_full_name|default:user.username }}! Start predicting HIC values for your designs.</p>
+</div>
+<div class="row g-4 mb-4">
+    <div class="col-sm-4">
+        <div class="card-modern stat-card stat-orange">
+            <div class="stat-icon"><i class="fas fa-chart-line"></i></div>
+            <div class="stat-number">{{ my_predictions }}</div>
+            <div class="stat-label">My Predictions</div>
+            <div class="stat-bg"><i class="fas fa-chart-line"></i></div>
+        </div>
+    </div>
+    <div class="col-sm-4">
+        <div class="card-modern stat-card stat-green">
+            <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+            <div class="stat-number">{{ safe_count }}</div>
+            <div class="stat-label">Safe Results</div>
+            <div class="stat-bg"><i class="fas fa-check"></i></div>
+        </div>
+    </div>
+    <div class="col-sm-4">
+        <div class="card-modern stat-card stat-red">
+            <div class="stat-icon"><i class="fas fa-exclamation-circle"></i></div>
+            <div class="stat-number">{{ danger_count }}</div>
+            <div class="stat-label">Danger Alerts</div>
+            <div class="stat-bg"><i class="fas fa-exclamation"></i></div>
+        </div>
+    </div>
+</div>
+<div class="row g-4">
+    <div class="col-md-8">
+        <div class="card-modern p-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h6 class="fw-bold mb-0"><i class="fas fa-history me-2" style="color:#e94560;"></i>My Recent Predictions</h6>
+                <a href="{% url 'predictions:prediction_history' %}" class="btn btn-sm btn-accent" style="border-radius:8px;">View All</a>
+            </div>
+            <table class="table table-modern mb-0" style="font-size:0.85rem;">
+                <thead><tr><th>#</th><th>HIC Value</th><th>Safety</th><th>Date</th><th></th></tr></thead>
+                <tbody>
+                    {% for p in recent_predictions %}
+                    <tr>
+                        <td>#{{ p.id }}</td>
+                        <td><strong>{{ p.predicted_hic|floatformat:2 }}</strong></td>
+                        <td>
+                            <span class="badge {% if p.safety_status == 'safe' %}badge-safe{% elif p.safety_status == 'warning' %}badge-warning-custom{% else %}badge-danger-custom{% endif %}" style="border-radius:6px;">
+                                {{ p.safety_status|upper }}
+                            </span>
+                        </td>
+                        <td>{{ p.created_at|date:"M d, Y" }}</td>
+                        <td><a href="{% url 'predictions:prediction_detail' p.pk %}" class="btn btn-sm btn-highlight" style="border-radius:7px;"><i class="fas fa-eye"></i></a></td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="5" class="text-center text-muted py-3">No predictions yet. <a href="{% url 'predictions:predict' %}">Make your first prediction!</a></td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card-modern p-4 text-center">
+            {% if active_model %}
+            <div style="width:60px;height:60px;background:linear-gradient(135deg,#d4edda,#c8e6c9);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#2e7d32;font-size:1.6rem;margin:0 auto 12px;">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h6 class="fw-bold mb-1">Model Ready</h6>
+            <p class="text-muted mb-3" style="font-size:0.82rem;">{{ active_model.name }}</p>
+            <div class="mb-2" style="font-size:0.8rem;"><span class="text-muted">Accuracy:</span> <strong>{{ active_model.accuracy|floatformat:1 }}%</strong></div>
+            <a href="{% url 'predictions:predict' %}" class="btn btn-accent w-100 mt-2" style="border-radius:10px;font-weight:600;">
+                <i class="fas fa-calculator me-2"></i>Predict Now
+            </a>
+            {% else %}
+            <div style="width:60px;height:60px;background:#f8d7da;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#721c24;font-size:1.6rem;margin:0 auto 12px;">
+                <i class="fas fa-exclamation-circle"></i>
+            </div>
+            <h6 class="fw-bold mb-1">No Active Model</h6>
+            <p class="text-muted" style="font-size:0.82rem;">Contact admin to train a model.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+{% if user.role == 'admin' %}
+<script>
+const ctx = document.getElementById('safetyChart').getContext('2d');
+new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+        labels: ['Safe', 'Warning', 'Danger'],
+        datasets: [{
+            data: [{{ safe_count }}, {{ warning_count }}, {{ danger_count }}],
+            backgroundColor: ['#06d6a0', '#ffd166', '#ef476f'],
+            borderWidth: 0,
+        }]
+    },
+    options: {
+        responsive: true, cutout: '70%',
+        plugins: { legend: { position: 'bottom', labels: { font: { size: 12 }, padding: 16 } } }
+    }
+});
+</script>
+{% endif %}
+{% endblock %}

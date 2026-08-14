@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}HIC Prediction System{% endblock %}</title>
+    {% load static %}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1a1a2e;
+            --secondary: #16213e;
+            --accent: #e94560;
+            --highlight: #0f3460;
+            --teal: #00b4d8;
+            --light-bg: #f0f2f5;
+            --card-bg: #ffffff;
+            --text-dark: #1a1a2e;
+            --text-muted: #6c757d;
+            --sidebar-w: 260px;
+            --success: #06d6a0;
+            --warning: #ffd166;
+            --danger: #ef476f;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--light-bg);
+            color: var(--text-dark);
+        }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            position: fixed; top: 0; left: 0;
+            width: var(--sidebar-w); height: 100vh;
+            background: linear-gradient(180deg, var(--primary) 0%, var(--secondary) 60%, var(--highlight) 100%);
+            z-index: 1000;
+            transition: all 0.3s ease;
+            box-shadow: 4px 0 20px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .sidebar-brand {
+            padding: 24px 20px 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            flex-shrink: 0;
+        }
+        .sidebar-brand h4 {
+            color: #fff; font-weight: 800; font-size: 1.1rem;
+            letter-spacing: 0.5px;
+        }
+        .sidebar-brand small {
+            color: var(--teal); font-size: 0.72rem; font-weight: 500;
+        }
+        .sidebar-brand .brand-icon {
+            width: 42px; height: 42px;
+            background: linear-gradient(135deg, var(--accent), #ff6b6b);
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; font-size: 1.3rem; margin-bottom: 10px;
+        }
+
+        /* Scrollable menu area */
+        .sidebar-menu {
+            padding: 12px 0 8px 0;
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+        .sidebar-menu::-webkit-scrollbar { width: 3px; }
+        .sidebar-menu::-webkit-scrollbar-track { background: transparent; }
+        .sidebar-menu::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 3px; }
+
+        .sidebar-section {
+            padding: 10px 20px 4px;
+            font-size: 0.65rem; font-weight: 700;
+            color: rgba(255,255,255,0.4);
+            text-transform: uppercase; letter-spacing: 1.5px;
+        }
+        .sidebar-link {
+            display: flex; align-items: center; gap: 12px;
+            padding: 11px 20px; color: rgba(255,255,255,0.7);
+            text-decoration: none; font-size: 0.875rem; font-weight: 500;
+            border-left: 3px solid transparent;
+            transition: all 0.2s ease;
+        }
+        .sidebar-link:hover, .sidebar-link.active {
+            color: #fff;
+            background: rgba(255,255,255,0.08);
+            border-left-color: var(--accent);
+        }
+        .sidebar-link i { width: 18px; text-align: center; font-size: 0.9rem; }
+
+        /* Fixed bottom user section */
+        .sidebar-user {
+            flex-shrink: 0;
+            padding: 14px 16px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            background: rgba(0,0,0,0.25);
+        }
+        .sidebar-user .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .sidebar-user .user-avatar {
+            width: 34px; height: 34px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), #ff6b6b);
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; font-weight: 700; font-size: 0.75rem;
+            flex-shrink: 0;
+        }
+        .sidebar-user .user-name {
+            color: #fff; font-weight: 600; font-size: 0.82rem;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            max-width: 150px;
+        }
+        .sidebar-user .user-role {
+            color: var(--teal); font-size: 0.68rem;
+            text-transform: uppercase; font-weight: 600;
+        }
+        .sidebar-logout {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            padding: 8px 12px;
+            background: rgba(233, 69, 96, 0.15);
+            border: 1px solid rgba(233, 69, 96, 0.35);
+            border-radius: 8px;
+            color: #ff8fa3;
+            font-size: 0.82rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        .sidebar-logout:hover {
+            background: rgba(233, 69, 96, 0.35);
+            border-color: rgba(233, 69, 96, 0.7);
+            color: #fff;
+        }
+        .sidebar-logout i { font-size: 0.85rem; }
+
+        /* ===== MAIN CONTENT ===== */
+        .main-content {
+            margin-left: var(--sidebar-w);
+            min-height: 100vh;
+            display: flex; flex-direction: column;
+        }
+
+        /* ===== TOPBAR ===== */
+        .topbar {
+            background: #fff;
+            padding: 0 28px;
+            height: 64px;
+            display: flex; align-items: center; justify-content: space-between;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            position: sticky; top: 0; z-index: 100;
+        }
+        .topbar-title { font-size: 1.1rem; font-weight: 700; color: var(--primary); }
+        .topbar-right { display: flex; align-items: center; gap: 16px; }
+        .topbar-badge {
+            width: 36px; height: 36px; border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), #ff6b6b);
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; font-weight: 700; font-size: 0.85rem;
+        }
+
+        /* ===== CONTENT AREA ===== */
+        .content-area { flex: 1; padding: 28px; }
+
+        /* ===== CARDS ===== */
+        .card-modern {
+            background: #fff; border-radius: 16px;
+            border: none; box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .card-modern:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(0,0,0,0.1); }
+        .stat-card {
+            border-radius: 16px; padding: 24px;
+            position: relative; overflow: hidden;
+        }
+        .stat-card .stat-icon {
+            width: 52px; height: 52px; border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.4rem; margin-bottom: 14px;
+        }
+        .stat-card .stat-number { font-size: 2rem; font-weight: 800; line-height: 1; }
+        .stat-card .stat-label { font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+        .stat-card .stat-bg {
+            position: absolute; right: -20px; bottom: -20px;
+            font-size: 5rem; opacity: 0.07;
+        }
+        .stat-blue   { background: linear-gradient(135deg, #e3f2fd, #bbdefb); color: #1565c0; }
+        .stat-blue   .stat-icon { background: #1565c0; color: #fff; }
+        .stat-green  { background: linear-gradient(135deg, #e8f5e9, #c8e6c9); color: #2e7d32; }
+        .stat-green  .stat-icon { background: #2e7d32; color: #fff; }
+        .stat-orange { background: linear-gradient(135deg, #fff3e0, #ffe0b2); color: #e65100; }
+        .stat-orange .stat-icon { background: #e65100; color: #fff; }
+        .stat-red    { background: linear-gradient(135deg, #fce4ec, #f8bbd9); color: #c62828; }
+        .stat-red    .stat-icon { background: #c62828; color: #fff; }
+        .stat-purple { background: linear-gradient(135deg, #f3e5f5, #e1bee7); color: #6a1b9a; }
+        .stat-purple .stat-icon { background: #6a1b9a; color: #fff; }
+        .stat-teal   { background: linear-gradient(135deg, #e0f7fa, #b2ebf2); color: #00695c; }
+        .stat-teal   .stat-icon { background: #00695c; color: #fff; }
+
+        /* ===== TABLE ===== */
+        .table-modern { border-radius: 12px; overflow: hidden; }
+        .table-modern thead th {
+            background: var(--primary); color: #fff;
+            font-size: 0.78rem; font-weight: 600;
+            text-transform: uppercase; letter-spacing: 0.5px;
+            padding: 12px 16px; border: none;
+        }
+        .table-modern tbody td { padding: 12px 16px; vertical-align: middle; border-color: #f0f2f5; }
+        .table-modern tbody tr:hover { background: #f8faff; }
+
+        /* ===== BADGES ===== */
+        .badge-safe          { background: #d4edda; color: #155724; font-weight: 600; }
+        .badge-warning-custom { background: #fff3cd; color: #856404; font-weight: 600; }
+        .badge-danger-custom  { background: #f8d7da; color: #721c24; font-weight: 600; }
+
+        /* ===== BUTTONS ===== */
+        .btn-accent           { background: var(--accent); color: #fff; border: none; font-weight: 600; }
+        .btn-accent:hover     { background: #c73652; color: #fff; }
+        .btn-highlight        { background: var(--highlight); color: #fff; border: none; font-weight: 600; }
+        .btn-highlight:hover  { background: #0a2540; color: #fff; }
+
+        /* ===== FORM ===== */
+        .form-control:focus, .form-select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 0.2rem rgba(233,69,96,0.15);
+        }
+
+        /* ===== PAGE HEADER ===== */
+        .page-header {
+            background: linear-gradient(135deg, var(--primary), var(--highlight));
+            border-radius: 16px; padding: 28px 32px; margin-bottom: 28px; color: #fff;
+        }
+        .page-header h2 { font-weight: 800; margin-bottom: 4px; }
+        .page-header p  { opacity: 0.75; margin: 0; font-size: 0.9rem; }
+
+        /* ===== ALERTS ===== */
+        .alert { border-radius: 12px; border: none; font-size: 0.9rem; }
+
+        /* ===== HIC STATUS ===== */
+        .hic-safe    { color: #155724; background: #d4edda; border-radius: 8px; padding: 2px 10px; font-weight: 700; }
+        .hic-warning { color: #856404; background: #fff3cd; border-radius: 8px; padding: 2px 10px; font-weight: 700; }
+        .hic-danger  { color: #721c24; background: #f8d7da; border-radius: 8px; padding: 2px 10px; font-weight: 700; }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); }
+            .main-content { margin-left: 0; }
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+{% if user.is_authenticated %}
+
+<!-- ===== SIDEBAR ===== -->
+<div class="sidebar">
+
+    <!-- Brand -->
+    <div class="sidebar-brand">
+        <div class="brand-icon"><i class="fas fa-car-crash"></i></div>
+        <h4>HIC Predict</h4>
+        <small>Head Injury Criteria System</small>
+    </div>
+
+    <!-- Scrollable Menu -->
+    <div class="sidebar-menu">
+        <div class="sidebar-section">Main</div>
+        <a href="{% url 'dashboard:home' %}"
+           class="sidebar-link {% if request.resolver_match.app_name == 'dashboard' %}active{% endif %}">
+            <i class="fas fa-th-large"></i> Dashboard
+        </a>
+
+        {% if user.role == 'admin' %}
+        <div class="sidebar-section">Management</div>
+        <a href="{% url 'accounts:admin_user_list' %}"
+           class="sidebar-link {% if 'users' in request.path %}active{% endif %}">
+            <i class="fas fa-users"></i> Users
+        </a>
+        <a href="{% url 'datasets:dataset_list' %}"
+           class="sidebar-link {% if request.resolver_match.app_name == 'datasets' %}active{% endif %}">
+            <i class="fas fa-database"></i> Datasets
+        </a>
+        <a href="{% url 'models_app:model_list' %}"
+           class="sidebar-link {% if request.resolver_match.app_name == 'models_app' %}active{% endif %}">
+            <i class="fas fa-brain"></i> ML Models
+        </a>
+        <div class="sidebar-section">Analysis</div>
+        <a href="{% url 'predictions:prediction_history' %}"
+           class="sidebar-link {% if request.resolver_match.app_name == 'predictions' %}active{% endif %}">
+            <i class="fas fa-chart-line"></i> All Predictions
+        </a>
+        <a href="{% url 'reports:reports_home' %}"
+           class="sidebar-link {% if request.resolver_match.app_name == 'reports' %}active{% endif %}">
+            <i class="fas fa-file-alt"></i> Reports
+        </a>
+
+        {% else %}
+        <div class="sidebar-section">Prediction</div>
+        <a href="{% url 'predictions:predict' %}"
+           class="sidebar-link {% if 'predict' in request.path and 'history' not in request.path %}active{% endif %}">
+            <i class="fas fa-calculator"></i> New Prediction
+        </a>
+        <a href="{% url 'predictions:prediction_history' %}"
+           class="sidebar-link {% if 'history' in request.path %}active{% endif %}">
+            <i class="fas fa-history"></i> My History
+        </a>
+        <a href="{% url 'reports:prediction_report' %}"
+           class="sidebar-link {% if request.resolver_match.app_name == 'reports' %}active{% endif %}">
+            <i class="fas fa-file-download"></i> My Reports
+        </a>
+        {% endif %}
+
+        <div class="sidebar-section">Account</div>
+        <a href="{% url 'accounts:profile' %}"
+           class="sidebar-link {% if 'profile' in request.path %}active{% endif %}">
+            <i class="fas fa-user-circle"></i> Profile
+        </a>
+    </div>
+
+    <!-- Fixed Bottom User + Logout -->
+    <div class="sidebar-user">
+        <div class="user-info">
+            <div class="user-avatar">
+                {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
+            </div>
+            <div style="overflow:hidden;">
+                <div class="user-name">{{ user.get_full_name|default:user.username }}</div>
+                <div class="user-role">{{ user.role }}</div>
+            </div>
+        </div>
+        <a href="{% url 'accounts:logout' %}" class="sidebar-logout">
+            <i class="fas fa-sign-out-alt"></i>
+            Logout
+        </a>
+    </div>
+
+</div>
+
+<!-- ===== MAIN CONTENT ===== -->
+<div class="main-content">
+
+    <!-- Topbar -->
+    <div class="topbar">
+        <div class="topbar-title">{% block page_title %}Dashboard{% endblock %}</div>
+        <div class="topbar-right">
+            {% if messages %}
+                {% for message in messages %}
+                <span class="badge bg-{% if message.tags == 'error' %}danger{% elif message.tags == 'warning' %}warning text-dark{% else %}success{% endif %} px-3 py-2"
+                      style="border-radius:8px;">
+                    {{ message }}
+                </span>
+                {% endfor %}
+            {% endif %}
+            <div class="topbar-badge">
+                {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
+            </div>
+            <small class="text-muted d-none d-md-block">
+                {{ user.get_full_name|default:user.username }}
+            </small>
+        </div>
+    </div>
+
+    <!-- Page Content -->
+    <div class="content-area">
+        {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-{% if message.tags == 'error' %}danger{% elif message.tags == 'warning' %}warning{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show mb-3"
+                 role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+        {% endif %}
+        {% block content %}{% endblock %}
+    </div>
+
+</div>
+
+{% else %}
+{% block auth_content %}{% endblock %}
+{% endif %}
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

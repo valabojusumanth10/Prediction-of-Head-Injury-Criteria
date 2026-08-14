@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}Delete Model{% endblock %}
+{% block page_title %}Delete Model{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-5">
+        <div class="card-modern p-4 text-center">
+            <div style="width:70px;height:70px;background:#f8d7da;border-radius:50%;
+                        display:flex;align-items:center;justify-content:center;
+                        color:#721c24;font-size:1.8rem;margin:0 auto 16px;">
+                <i class="fas fa-trash"></i>
+            </div>
+            <h5 class="fw-bold mb-2">Delete Model?</h5>
+            <p class="text-muted mb-1">You are about to delete:</p>
+            <p class="fw-bold mb-4" style="color:#e94560;">{{ model.name }}</p>
+            <p class="text-muted mb-4" style="font-size:0.88rem;">
+                This will permanently delete the model and its trained files.
+                This action <strong>cannot be undone</strong>.
+            </p>
+            <form method="post" class="d-flex gap-2 justify-content-center">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger px-4" style="border-radius:10px;">
+                    <i class="fas fa-trash me-2"></i>Yes, Delete
+                </button>
+                <a href="{% url 'models_app:model_list' %}"
+                   class="btn btn-secondary px-4" style="border-radius:10px;">
+                    <i class="fas fa-arrow-left me-2"></i>Cancel
+                </a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

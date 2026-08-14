@@ -1,0 +1,190 @@
+{% extends 'base.html' %}
+{% block title %}Evaluate Model{% endblock %}
+{% block page_title %}Model Evaluation{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h2><i class="fas fa-chart-bar me-2"></i>Model Evaluation</h2>
+            <p>{{ model.name }} — Performance against full dataset</p>
+        </div>
+        <a href="{% url 'models_app:model_detail' model.pk %}"
+           class="btn btn-secondary px-4" style="border-radius:10px;">
+            <i class="fas fa-arrow-left me-2"></i>Back
+        </a>
+    </div>
+</div>
+
+{% if evaluation_data %}
+<div class="row g-4 mb-4">
+    <div class="col-sm-6 col-xl-2">
+        <div class="card-modern p-3 text-center">
+            <div style="font-size:1.6rem;font-weight:800;color:#2e7d32;">
+                {{ evaluation_data.accuracy }}%
+            </div>
+            <div style="font-size:0.72rem;color:#6c757d;font-weight:700;
+                        text-transform:uppercase;letter-spacing:.5px;">Accuracy</div>
+            <div style="margin-top:8px;height:6px;background:#e9ecef;border-radius:3px;overflow:hidden;">
+                <div style="width:{{ evaluation_data.accuracy }}%;height:100%;
+                            background:#2e7d32;border-radius:3px;"></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-2">
+        <div class="card-modern p-3 text-center">
+            <div style="font-size:1.6rem;font-weight:800;color:#e94560;">{{ evaluation_data.mse }}</div>
+            <div style="font-size:0.72rem;color:#6c757d;font-weight:700;
+                        text-transform:uppercase;letter-spacing:.5px;">MSE</div>
+            <div style="font-size:0.72rem;color:#6c757d;margin-top:6px;">Mean Squared Error</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-2">
+        <div class="card-modern p-3 text-center">
+            <div style="font-size:1.6rem;font-weight:800;color:#e65100;">{{ evaluation_data.rmse }}</div>
+            <div style="font-size:0.72rem;color:#6c757d;font-weight:700;
+                        text-transform:uppercase;letter-spacing:.5px;">RMSE</div>
+            <div style="font-size:0.72rem;color:#6c757d;margin-top:6px;">Root Mean Sq. Error</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-2">
+        <div class="card-modern p-3 text-center">
+            <div style="font-size:1.6rem;font-weight:800;color:#1565c0;">{{ evaluation_data.mae }}</div>
+            <div style="font-size:0.72rem;color:#6c757d;font-weight:700;
+                        text-transform:uppercase;letter-spacing:.5px;">MAE</div>
+            <div style="font-size:0.72rem;color:#6c757d;margin-top:6px;">Mean Absolute Error</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-2">
+        <div class="card-modern p-3 text-center">
+            <div style="font-size:1.6rem;font-weight:800;color:#00695c;">{{ evaluation_data.r2 }}</div>
+            <div style="font-size:0.72rem;color:#6c757d;font-weight:700;
+                        text-transform:uppercase;letter-spacing:.5px;">R² Score</div>
+            <div style="font-size:0.72rem;color:#6c757d;margin-top:6px;">Coefficient of Det.</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-2">
+        <div class="card-modern p-3 text-center">
+            <div style="font-size:1.6rem;font-weight:800;color:#6a1b9a;">{{ evaluation_data.correlation }}</div>
+            <div style="font-size:0.72rem;color:#6c757d;font-weight:700;
+                        text-transform:uppercase;letter-spacing:.5px;">Correlation</div>
+            <div style="font-size:0.72rem;color:#6c757d;margin-top:6px;">With reference data</div>
+        </div>
+    </div>
+</div>
+
+<div class="card-modern p-4 mb-4">
+    <h6 class="fw-bold mb-3">
+        <i class="fas fa-info-circle me-2" style="color:#e94560;"></i>Evaluation Interpretation
+    </h6>
+    <div class="row g-3">
+        <div class="col-md-4">
+            <div class="p-3 rounded"
+                 style="background:{% if evaluation_data.accuracy >= 80 %}#d4edda{% elif evaluation_data.accuracy >= 60 %}#fff3cd{% else %}#f8d7da{% endif %};">
+                <div class="fw-bold" style="font-size:0.85rem;
+                    color:{% if evaluation_data.accuracy >= 80 %}#155724{% elif evaluation_data.accuracy >= 60 %}#856404{% else %}#721c24{% endif %};">
+                    {% if evaluation_data.accuracy >= 80 %}✅ Good Accuracy
+                    {% elif evaluation_data.accuracy >= 60 %}⚠️ Moderate Accuracy
+                    {% else %}❌ Low Accuracy{% endif %}
+                </div>
+                <div style="font-size:0.78rem;margin-top:4px;color:#555;">
+                    {% if evaluation_data.accuracy >= 80 %}Model is reliable for production use.
+                    {% elif evaluation_data.accuracy >= 60 %}Consider retraining with more data.
+                    {% else %}Model needs significant improvement.{% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="p-3 rounded"
+                 style="background:{% if evaluation_data.r2 >= 0.8 %}#d4edda{% elif evaluation_data.r2 >= 0.6 %}#fff3cd{% else %}#f8d7da{% endif %};">
+                <div class="fw-bold" style="font-size:0.85rem;
+                    color:{% if evaluation_data.r2 >= 0.8 %}#155724{% elif evaluation_data.r2 >= 0.6 %}#856404{% else %}#721c24{% endif %};">
+                    {% if evaluation_data.r2 >= 0.8 %}✅ Strong R² Score
+                    {% elif evaluation_data.r2 >= 0.6 %}⚠️ Moderate R²
+                    {% else %}❌ Weak R²{% endif %}
+                </div>
+                <div style="font-size:0.78rem;margin-top:4px;color:#555;">
+                    R² of {{ evaluation_data.r2 }} — explains
+                    {{ evaluation_data.r2|floatformat:0 }}% of variance.
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="p-3 rounded"
+                 style="background:{% if evaluation_data.correlation >= 0.9 %}#d4edda{% elif evaluation_data.correlation >= 0.7 %}#fff3cd{% else %}#f8d7da{% endif %};">
+                <div class="fw-bold" style="font-size:0.85rem;
+                    color:{% if evaluation_data.correlation >= 0.9 %}#155724{% elif evaluation_data.correlation >= 0.7 %}#856404{% else %}#721c24{% endif %};">
+                    {% if evaluation_data.correlation >= 0.9 %}✅ High Correlation
+                    {% elif evaluation_data.correlation >= 0.7 %}⚠️ Moderate Correlation
+                    {% else %}❌ Low Correlation{% endif %}
+                </div>
+                <div style="font-size:0.78rem;margin-top:4px;color:#555;">
+                    Correlation of {{ evaluation_data.correlation }} with reference data.
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="mt-3" style="font-size:0.82rem;color:#6c757d;">
+        <strong>Total samples evaluated:</strong> {{ evaluation_data.total_samples }} records
+    </div>
+</div>
+
+<div class="card-modern">
+    <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
+        <h6 class="fw-bold mb-0">
+            <i class="fas fa-table me-2" style="color:#e94560;"></i>Actual vs Predicted (Sample of 20)
+        </h6>
+        <span class="badge" style="background:#e3f2fd;color:#1565c0;border-radius:8px;
+                                   font-size:0.78rem;padding:6px 12px;">
+            From {{ evaluation_data.total_samples }} total records
+        </span>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-modern mb-0" style="font-size:0.85rem;">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Actual HIC</th>
+                    <th>Predicted HIC</th>
+                    <th>Absolute Error</th>
+                    <th>Quality</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for actual, predicted, error in evaluation_data.pairs %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td><strong>{{ actual }}</strong></td>
+                    <td>
+                        <strong style="color:{% if error < 50 %}#2e7d32{% elif error < 150 %}#e65100{% else %}#c62828{% endif %};">
+                            {{ predicted }}
+                        </strong>
+                    </td>
+                    <td>{{ error }}</td>
+                    <td>
+                        {% if error < 50 %}
+                        <span class="badge badge-safe" style="border-radius:6px;font-size:0.72rem;">Excellent</span>
+                        {% elif error < 150 %}
+                        <span class="badge badge-warning-custom" style="border-radius:6px;font-size:0.72rem;">Acceptable</span>
+                        {% else %}
+                        <span class="badge badge-danger-custom" style="border-radius:6px;font-size:0.72rem;">High Error</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% else %}
+<div class="alert alert-warning" style="border-radius:12px;">
+    <i class="fas fa-exclamation-triangle me-2"></i>
+    {% if model.status != 'trained' %}
+        This model has not been trained yet.
+        <a href="{% url 'models_app:model_list' %}">Go back and train the model first.</a>
+    {% else %}
+        Could not load model files for evaluation.
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}

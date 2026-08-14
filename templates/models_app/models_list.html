@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% block title %}ML Models{% endblock %}
+{% block page_title %}ML Models{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h2><i class="fas fa-brain me-2"></i>Machine Learning Models</h2>
+            <p>Train and manage deep neural network models for HIC prediction</p>
+        </div>
+        <a href="{% url 'models_app:model_train' %}" class="btn btn-accent px-4" style="border-radius:10px;">
+            <i class="fas fa-plus me-2"></i>Train New Model
+        </a>
+    </div>
+</div>
+<div class="card-modern">
+    <div class="table-responsive">
+        <table class="table table-modern mb-0">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Name</th>
+                    <th>Dataset</th>
+                    <th>Accuracy</th>
+                    <th>MSE</th>
+                    <th>R²</th>
+                    <th>Status</th>
+                    <th>Active</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for m in models %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>
+                        <strong>{{ m.name }}</strong>
+                        <br>
+                        <small class="text-muted">{{ m.epochs }} epochs | {{ m.num_layers }} layers</small>
+                    </td>
+                    <td>{{ m.dataset.name|default:"N/A"|truncatechars:20 }}</td>
+                    <td>
+                        {% if m.accuracy %}
+                        <div class="d-flex align-items-center gap-2">
+                            <div style="width:60px;height:6px;background:#e9ecef;border-radius:3px;overflow:hidden;">
+                                <div style="width:{{ m.accuracy }}%;height:100%;background:{% if m.accuracy > 80 %}#06d6a0{% elif m.accuracy > 60 %}#ffd166{% else %}#ef476f{% endif %};border-radius:3px;"></div>
+                            </div>
+                            <span style="font-size:0.82rem;font-weight:700;">{{ m.accuracy|floatformat:1 }}%</span>
+                        </div>
+                        {% else %}
+                        <span class="text-muted">N/A</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ m.mse|floatformat:4|default:"N/A" }}</td>
+                    <td>{{ m.r2_score|floatformat:4|default:"N/A" }}</td>
+                    <td>
+                        <span class="badge px-2 py-1" style="border-radius:6px;font-size:0.75rem;
+                            background:{% if m.status == 'trained' %}#d4edda{% elif m.status == 'failed' %}#f8d7da{% elif m.status == 'training' %}#fff3cd{% else %}#e3f2fd{% endif %};
+                            color:{% if m.status == 'trained' %}#155724{% elif m.status == 'failed' %}#721c24{% elif m.status == 'training' %}#856404{% else %}#1565c0{% endif %};">
+                            {{ m.status|upper }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if m.is_active %}
+                        <span class="badge px-2 py-1" style="background:#d4edda;color:#155724;border-radius:6px;font-size:0.75rem;">
+                            ✓ ACTIVE
+                        </span>
+                        {% else %}
+                            {% if m.status == 'trained' %}
+                            <form method="post" action="{% url 'models_app:set_active_model' m.pk %}" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm" style="border-radius:7px;background:#e3f2fd;color:#1565c0;font-size:0.75rem;border:none;">
+                                    Set Active
+                                </button>
+                            </form>
+                            {% else %}
+                            <span class="text-muted" style="font-size:0.78rem;">—</span>
+                            {% endif %}
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="d-flex gap-1">
+                            <a href="{% url 'models_app:model_detail' m.pk %}"
+                               class="btn btn-sm btn-highlight" style="border-radius:7px;" title="View">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            {% if m.status == 'trained' %}
+                            <a href="{% url 'models_app:model_evaluate' m.pk %}"
+                               class="btn btn-sm btn-success" style="border-radius:7px;" title="Evaluate">
+                                <i class="fas fa-chart-bar"></i>
+                            </a>
+                            {% endif %}
+                            <a href="{% url 'models_app:model_delete' m.pk %}"
+                               class="btn btn-sm btn-danger" style="border-radius:7px;" title="Delete">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="9" class="text-center text-muted py-5">
+                        <i class="fas fa-brain fa-2x mb-3 d-block" style="opacity:0.3;"></i>
+                        No models trained yet.
+                        <a href="{% url 'models_app:model_train' %}">Train your first model!</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

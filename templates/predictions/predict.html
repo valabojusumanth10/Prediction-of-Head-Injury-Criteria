@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+{% block title %}HIC Prediction{% endblock %}
+{% block page_title %}HIC Prediction{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h2><i class="fas fa-calculator me-2"></i>Head Injury Criteria Prediction</h2>
+    <p>Enter vehicle hood parameters to predict the HIC value</p>
+</div>
+
+{% if not active_model %}
+<div class="alert alert-warning" style="border-radius:12px;">
+    <i class="fas fa-exclamation-triangle me-2"></i>
+    No trained model available. Please contact the administrator to train a model first.
+</div>
+{% else %}
+<div class="alert alert-success mb-4" style="border-radius:12px;font-size:0.88rem;">
+    <i class="fas fa-check-circle me-2"></i>
+    <strong>Active Model:</strong> {{ active_model.name }} — Accuracy: {{ active_model.accuracy|floatformat:1 }}%
+</div>
+
+<div class="card-modern p-4">
+    <h6 class="fw-bold mb-4" style="color:#0f3460;"><i class="fas fa-car me-2"></i>Vehicle Hood Parameters</h6>
+    <form method="post">
+        {% csrf_token %}
+
+        <div class="row g-3 mb-4">
+            <div class="col-12">
+                <h6 style="font-size:0.78rem;font-weight:700;color:#6c757d;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid #f0f2f5;">
+                    <i class="fas fa-ruler-combined me-1"></i> Geometric Properties
+                </h6>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-600" style="font-size:0.84rem;">Hood Length (mm)</label>
+                <input type="number" name="hood_length" class="form-control" placeholder="e.g. 1200" step="0.01" style="border-radius:10px;" required>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-600" style="font-size:0.84rem;">Hood Width (mm)</label>
+                <input type="number" name="hood_width" class="form-control" placeholder="e.g. 1500" step="0.01" style="border-radius:10px;" required>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-600" style="font-size:0.84rem;">Hood Thickness (mm)</label>
+                <input type="number" name="hood_thickness" class="form-control" placeholder="e.g. 0.8" step="0.001" style="border-radius:10px;" required>
+            </div>
+        </div>
+
+        <div class="row g-3 mb-4">
+            <div class="col-12">
+                <h6 style="font-size:0.78rem;font-weight:700;color:#6c757d;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid #f0f2f5;">
+                    <i class="fas fa-atom me-1"></i> Material Properties
+                </h6>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-600" style="font-size:0.84rem;">Material Density (kg/m³)</label>
+                <input type="number" name="material_density" class="form-control" placeholder="e.g. 2700" step="0.01" style="border-radius:10px;" required>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-600" style="font-size:0.84rem;">Young's Modulus (GPa)</label>
+                <input type="number" name="youngs_modulus" class="form-control" placeholder="e.g. 70" step="0.01" style="border-radius:10px;" required>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-600" style="font-size:0.84rem;">Poisson's Ratio</label>
+                <input type="number" name="poisson_ratio" class="form-control" placeholder="e.g. 0.33" step="0.001" style="border-radius:10px;" required>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-600" style="font-size:0.84rem;">Yield Strength (MPa)</label>
+                <input type="number" name="yield_strength" class="form-control" placeholder="e.g. 250" step="0.01" style="border-radius:10px;" required>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-600" style="font-size:0.84rem;">Hood Mass (kg)</label>
+                <input type="number" name="hood_mass" class="form-control" placeholder="e.g. 12" step="0.01" style="border-radius:10px;" required>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-600" style="font-size:0.84rem;">Stiffness (N/m)</label>
+                <input type="number" name="stiffness" class="form-control" placeholder="e.g. 50000" step="0.01" style="border-radius:10px;" required>
+            </div>
+        </div>
+
+        <div class="row g-3 mb-4">
+            <div class="col-12">
+                <h6 style="font-size:0.78rem;font-weight:700;color:#6c757d;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid #f0f2f5;">
+                    <i class="fas fa-bolt me-1"></i> Impact Parameters
+                </h6>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-600" style="font-size:0.84rem;">Impact Velocity (m/s)</label>
+                <input type="number" name="impact_velocity" class="form-control" placeholder="e.g. 9.7" step="0.01" style="border-radius:10px;" required>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-600" style="font-size:0.84rem;">Impact Angle (°)</label>
+                <input type="number" name="impact_angle" class="form-control" placeholder="e.g. 65" step="0.01" style="border-radius:10px;" required>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-600" style="font-size:0.84rem;">Energy Absorption (J)</label>
+                <input type="number" name="energy_absorption" class="form-control" placeholder="e.g. 800" step="0.01" style="border-radius:10px;" required>
+            </div>
+        </div>
+
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-accent px-5 py-2" style="border-radius:10px;font-weight:700;font-size:1rem;">
+                <i class="fas fa-calculator me-2"></i>Predict HIC Value
+            </button>
+            <button type="reset" class="btn btn-secondary px-4" style="border-radius:10px;">
+                <i class="fas fa-redo me-2"></i>Reset
+            </button>
+        </div>
+    </form>
+</div>
+{% endif %}
+{% endblock %}
