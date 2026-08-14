@@ -121,8 +121,10 @@ Python-dotenv
 
 The repository's dependency file includes Django, Django REST Framework, MySQL support, NumPy, Pandas, Scikit-learn, TensorFlow/Keras and other supporting packages used by the application.
 
+
+##home screen
 <img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/512a1fe5-89e5-462d-b6b6-67dac104b0d4" />
-<img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/4fb8423c-371a-4507-8530-54f86e9bc8a9" />
+
 
 ⚙️ Installation & Setup
 1. Clone the Repository
